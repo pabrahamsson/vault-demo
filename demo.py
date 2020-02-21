@@ -14,6 +14,7 @@ def secrets():
 
     secret_path = 'producta/servicea'
     kv_secret = client.secrets.kv.read_secret_version(path=secret_path)
+    return '{"username":"{username}","password":"{password}"}'.format(username=kv_secret['data']['data']['username'],password=kv_secret['data']['data']['password'])
 
 if __name__ == '__main__':
     demo.run()
