@@ -22,4 +22,4 @@ def secrets():
     }
 
 if __name__ == '__main__':
-    demo.run()
+    demo.run(host="0.0.0.0")
