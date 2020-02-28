@@ -30,8 +30,8 @@ def db():
     jwt = f.read()
     k8s_token = client.auth_kubernetes(role="app-role", jwt=jwt, mount_point="kubernetes-demo")['auth']['client_token']
     db_token = client.create_token(policies=['demo-db-read'], lease='1h')['auth']['client_token']
-    db_creds = requests.get("{url}/v1/database/creds/myreadonly".format(url=url),headers={'X-Vault-Token':db_token})['data']
-    return db_creds
+    db_creds = requests.get("{url}/v1/database/creds/myreadonly".format(url=url),headers={'X-Vault-Token':db_token})
+    return db_creds.json()
 
 if __name__ == '__main__':
     demo.run(host="0.0.0.0",port=8080)
