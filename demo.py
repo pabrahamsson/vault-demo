@@ -50,21 +50,21 @@ def db():
                 host='mysql',
                 database='sampledb'
         )
-        html + "<h4>Connected to sampledb</h4>"
-        html + "<h4>" + db_creds.text + "</h4>"
+        html += "<h4>Connected to sampledb</h4>"
+        html += "<h4>" + db_creds.text + "</h4>"
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
-            html + "<h4>Check them creds</h4>"
+            html += "<h4>Check them creds</h4>"
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
             print("Database does not exist")
-            html + "<h4>Um, no record of that db</h4>"
+            html += "<h4>Um, no record of that db</h4>"
         else:
             print(err)
-            html + "<h4>" + err + "</h4>"
+            html += "<h4>" + err + "</h4>"
     else:
         cnx.close()
-    html + '</body>\n</html>'
+    html += '</body>\n</html>'
     return render_template_string(html)
 
 if __name__ == '__main__':
