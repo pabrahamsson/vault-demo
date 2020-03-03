@@ -65,7 +65,7 @@ def db():
     else:
         cnx.close()
     html + '</body>\n</html>'
-    return render_template(html)
+    return render_template_string(html)
 
 if __name__ == '__main__':
     demo.run(host="0.0.0.0",port=8080)
