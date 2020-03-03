@@ -4,7 +4,7 @@ import hvac
 import mysql.connector
 import os
 import requests
-from flask import Flask, render_template
+from flask import Flask, render_template_string
 from mysql.connector import errorcode
 
 demo = Flask(__name__)
