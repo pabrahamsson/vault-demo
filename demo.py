@@ -51,7 +51,7 @@ def db():
                 database='sampledb'
         )
         html + "<h4>Connected to sampledb</h4>"
-        html + "<h4>" + db_creds.json() + "</h4>"
+        html + "<h4>" + db_creds.text + "</h4>"
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
