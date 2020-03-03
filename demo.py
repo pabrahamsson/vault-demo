@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import base64
 import hvac
 import mysql.connector
 import os
@@ -13,26 +14,30 @@ client = hvac.Client(url=url)
 
 
 def db_connect(client):
-    config = os.environ.get('DB_CONFIG')
+    config = get_db_config()
     if not config:
         db_creds = requests.get("{url}/v1/database/creds/myreadonly".format(url=url),headers={'X-Vault-Token':client.token})
-        config = {
-            'user': db_creds.json()['data']['username'],
-            'password': db_creds.json()['data']['password'],
-            'host': 'mysql',
-            'database': 'sampledb'
-        }
-        os.environ['DB_CONFIG'] = config
+        os.environ['DB_USER'] = db_creds.json()['data']['username']
+        os.environ['DB_PASS'] = db_creds.json()['data']['password']
+        config = get_db_config()
     try:
-        cnx = mysql.connector.connect(
-                user=db_creds.json()['data']['username'],
-                password=db_creds.json()['data']['password'],
-                host='mysql',
-                database='sampledb'
-        )
+        cnx = mysql.connector.connect(**config)
         return {'cnx': cnx, 'err': None}
     except mysql.connector.Error as err:
         return {'cnx': None, 'err': err.errno}
+
+
+def get_db_config():
+    db_user = os.environ.get('DB_USER')
+    db_pass = os.environ.get('DB_PASS')
+    if not db_user or not db_pass:
+        return None
+    return {
+        'user': db_user,
+        'password': db_pass,
+        'host': 'mysql',
+        'database': 'sampledb'
+    }
 
 
 def get_client():
