@@ -12,6 +12,29 @@ url = 'http://pa-vault.pa-vault.svc:8200'
 client = hvac.Client(url=url)
 
 
+def db_connect(client):
+    config = os.environ.get('DB_CONFIG')
+    if not config:
+        db_creds = requests.get("{url}/v1/database/creds/myreadonly".format(url=url),headers={'X-Vault-Token':client.token})
+        config = {
+            'user': db_creds.json()['data']['username'],
+            'password': db_creds.json()['data']['password'],
+            'host': 'mysql',
+            'database': 'sampledb'
+        }
+        os.environ['DB_CONFIG'] = config
+    try:
+        cnx = mysql.connector.connect(
+                user=db_creds.json()['data']['username'],
+                password=db_creds.json()['data']['password'],
+                host='mysql',
+                database='sampledb'
+        )
+        return {'cnx': cnx, 'err': None}
+    except mysql.connector.Error as err:
+        return {'cnx': None, 'err': err.errno}
+
+
 def get_client():
     client.token = os.environ.get('VAULT_TOKEN')
     if client.is_authenticated():
@@ -42,29 +65,12 @@ def db():
     html="""<html>
     <body>"""
     client = get_client()
-    db_creds = requests.get("{url}/v1/database/creds/myreadonly".format(url=url),headers={'X-Vault-Token':client.token})
-    try:
-        cnx = mysql.connector.connect(
-                user=db_creds.json()['data']['username'],
-                password=db_creds.json()['data']['password'],
-                host='mysql',
-                database='sampledb'
-        )
-        html += "<h4>Connected to sampledb</h4>"
-        html += "<h4>" + db_creds.text + "</h4>"
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-            html += "<h4>Check them creds</h4>"
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-            html += "<h4>Um, no record of that db</h4>"
-        else:
-            print(err)
-            html += "<h4>" + err + "</h4>"
-    else:
-        cnx.close()
-    html += '</body>\n</html>'
+    cnx = db_connect(client)
+    if cnx['err'] == errorcode.ER_ACCESS_DENIED_ERROR:
+        del os.environ['DB_CONFIG']
+        cnx = db_connect(client)
+    cnx['cnx'].close()
+    html += "<h4>Successfully connected to db</h4>"
     return render_template_string(html)
 
 if __name__ == '__main__':
