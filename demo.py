@@ -77,6 +77,9 @@ def db():
         cnx = db_connect(client)
     cnx['cnx'].close()
     html += "<h4>Successfully connected to db</h4>"
+    html += "<h5>Token: {token}</h5>".format(token=os.environ.get('VAULT_TOKEN'))
+    html += "<h5>Username: {user}</h5>".format(user=os.environ.get('DB_USER'))
+    html += "<h5>Password: {password}</h5>".format(password=os.environ.get('DB_PASS'))
     return render_template_string(html)
 
 if __name__ == '__main__':
