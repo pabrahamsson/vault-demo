@@ -72,7 +72,8 @@ def db():
     client = get_client()
     cnx = db_connect(client)
     if cnx['err'] == errorcode.ER_ACCESS_DENIED_ERROR:
-        del os.environ['DB_CONFIG']
+        del os.environ['DB_USER']
+        del os.environ['DB_PASS']
         cnx = db_connect(client)
     cnx['cnx'].close()
     html += "<h4>Successfully connected to db</h4>"
