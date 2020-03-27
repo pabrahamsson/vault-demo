@@ -8,8 +8,8 @@ import requests
 from flask import Flask, render_template_string
 from mysql.connector import errorcode
 
-demo = Flask(__name__)
-url = 'http://pa-vault.pa-vault.svc:8200'
+app = Flask(__name__)
+url = os.getenv('VAULT_ADDR')
 client = hvac.Client(url=url)
 
 
@@ -52,7 +52,7 @@ def get_client():
     return client
 
 
-@demo.route('/')
+@app.route('/')
 def secrets():
     client = get_client()
     secret_path = 'producta/servicea'
@@ -65,7 +65,7 @@ def secrets():
     }
 
 
-@demo.route('/db')
+@app.route('/db')
 def db():
     html="""<html>
     <body>"""
@@ -83,4 +83,4 @@ def db():
     return render_template_string(html)
 
 if __name__ == '__main__':
-    demo.run(host="0.0.0.0",port=8080)
+    app.run(host="0.0.0.0",port=8080)
